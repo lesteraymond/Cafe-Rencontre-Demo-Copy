@@ -1,10 +1,9 @@
-const rememberLogin = localStorage.getItem('rememberLogin');
-if (rememberLogin === 'true') {
-    window.location.replace('Product.html');
-}
+const API_BASE_URL = 'http://localhost:8001/backend/api';
 
 window.addEventListener('DOMContentLoaded', function () {
-    const savedUsername = localStorage.getItem('savedUsername');
+    // checkExistingSession();
+    
+    const savedUsername = localStorage.getItem('username');
     if (savedUsername) {
         const usernameInput = document.getElementById('username');
         const rememberCheckbox = document.getElementById('rememberMe');
@@ -27,65 +26,111 @@ window.addEventListener('DOMContentLoaded', function () {
         toggleBtn.addEventListener('click', function () {
             const passwordInput = document.getElementById('password');
             if (passwordInput) {
-                passwordInput.type =
+                passwordInput.type = 
                     passwordInput.type === 'password' ? 'text' : 'password';
             }
         });
     }
 });
 
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const rememberMe = document.getElementById('rememberMe').checked;
 
-    if (username === 'admin' && password === 'admin') {
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('username', username);
+    clearErrors();
 
-        if (rememberMe) {
-            localStorage.setItem('rememberLogin', 'true');
-            localStorage.setItem('savedUsername', username);
-        } else {
-            localStorage.removeItem('rememberLogin');
-            localStorage.removeItem('savedUsername');
-        }
-
-        window.location.href = 'Product.html';
-    } else {
-        const userInput = document.querySelector('.user-input');
-        const passInput = document.querySelector('.pass-input');
-
-        userInput.querySelector('input').style.border = '2px solid #ff6b6b';
-        passInput.querySelector('input').style.border = '2px solid #ff6b6b';
-
-        let errorMsg = document.querySelector('.error-message');
-        if (!errorMsg) {
-            errorMsg = document.createElement('p');
-            errorMsg.className = 'error-message';
-            errorMsg.style.color = '#ff6b6b';
-            errorMsg.style.fontSize = '13px';
-            errorMsg.style.textAlign = 'center';
-            errorMsg.style.position = 'absolute';
-            errorMsg.style.left = '0';
-            errorMsg.style.right = '0';
-            errorMsg.style.marginTop = '5px';
-            passInput.style.position = 'relative';
-            passInput.appendChild(errorMsg);
-        }
-
-        errorMsg.textContent = 'Invalid username or password';
-        errorMsg.style.display = 'block';
-        document.getElementById('password').value = '';
-
-        setTimeout(() => {
-            userInput.querySelector('input').style.border = '1px solid #e2d2c4';
-            passInput.querySelector('input').style.border = '1px solid #e2d2c4';
-            errorMsg.style.display = 'none';
-        }, 3000);
+    if (!username || !password) {
+        showError('Please fill all fields');
+        return;
     }
+
+    try {
+        console.log('Attempting login to:', `${API_BASE_URL}/login.php`);
+        
+        const response = await fetch(`${API_BASE_URL}/login.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+            // credentials: 'include'
+        });
+
+        console.log('Response status:', response.status);
+        
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+        
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (parseError) {
+            console.error('Failed to parse JSON:', parseError);
+            showError('Server returned invalid response');
+            return;
+        }
+        
+        console.log('Parsed data:', data);
+
+        if (data.success) {
+            if (rememberMe) {
+                localStorage.setItem('username', username);
+            } else {
+                localStorage.removeItem('username');
+            }
+            
+            window.location.href = 'Product.html';
+        } else {
+            showError(data.message || 'Login failed');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        showError(`Cannot connect to server: ${error.message}`);
+    }
+}
+
+function showError(message) {
+    const userInput = document.querySelector('.user-input');
+    const passInput = document.querySelector('.pass-input');
+
+    if (userInput) userInput.querySelector('input').style.border = '2px solid #ff6b6b';
+    if (passInput) passInput.querySelector('input').style.border = '2px solid #ff6b6b';
+
+    let errorMsg = document.querySelector('.error-message');
+    if (!errorMsg) {
+        errorMsg = document.createElement('p');
+        errorMsg.className = 'error-message';
+        errorMsg.style.color = '#ff6b6b';
+        errorMsg.style.fontSize = '13px';
+        errorMsg.style.textAlign = 'center';
+        errorMsg.style.marginTop = '10px';
+        errorMsg.style.marginBottom = '10px';
+        
+        const form = document.querySelector('form');
+        if (form) {
+            form.appendChild(errorMsg);
+        }
+    }
+
+    errorMsg.textContent = message;
+    errorMsg.style.display = 'block';
+}
+
+function clearErrors() {
+    const userInput = document.querySelector('.user-input');
+    const passInput = document.querySelector('.pass-input');
+    
+    if (userInput) userInput.querySelector('input').style.border = '1px solid #e2d2c4';
+    if (passInput) passInput.querySelector('input').style.border = '1px solid #e2d2c4';
+    
+    const errorMsg = document.querySelector('.error-message');
+    if (errorMsg) errorMsg.style.display = 'none';
 }
 
 function showForgotPasswordModal() {
@@ -112,46 +157,23 @@ function showForgotPasswordModal() {
             font-size:28px;cursor:pointer;color:#A18072;">&times;</span>
         <h2 style="text-align:center;color:#6b3a1f;">Forgot Password?</h2>
         <p style="text-align:center;font-size:13px;color:#A18072;">
-            Enter your email address to reset your password
+            Contact system administrator to reset your password.
         </p>
-        <input type="email" id="resetEmail"
-            placeholder="your.email@example.com"
-            style="width:93%;padding:12px;">
-        <button id="sendResetBtn"
+        <button onclick="closeForgotModal()"
             style="width:100%;padding:12px;margin-top:10px;
             background:#6F4E37;color:#fff;border:none;">
-            Send Reset Link
+            OK
         </button>
-        <p id="resetMessage"
-            style="text-align:center;font-size:13px;display:none;"></p>
     `;
 
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
-    modal.querySelector('.close-modal').onclick =
-        () => document.body.removeChild(overlay);
+    window.closeForgotModal = function() {
+        document.body.removeChild(overlay);
+    };
 
     overlay.onclick = e => {
         if (e.target === overlay) document.body.removeChild(overlay);
-    };
-
-    modal.querySelector('#sendResetBtn').onclick = function () {
-        const email = modal.querySelector('#resetEmail').value;
-        const msg = modal.querySelector('#resetMessage');
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        msg.style.display = 'block';
-
-        if (!email || !regex.test(email)) {
-            msg.style.color = '#ff6b6b';
-            msg.textContent = 'Invalid email';
-            return;
-        }
-
-        msg.style.color = '#4caf50';
-        msg.textContent = 'Reset link sent';
-
-        setTimeout(() => document.body.removeChild(overlay), 2000);
     };
 }

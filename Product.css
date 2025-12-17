@@ -599,3 +599,31 @@
   pointer-events: auto;
   z-index: 9999; 
 }
+
+.loading, .no-products, .error {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.loading p, .no-products p {
+    font-size: 16px;
+}
+
+.error {
+    color: #ff6b6b;
+}
+
+.error button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #532C04;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.product-item {
+    transition: all 0.3s ease;
+}

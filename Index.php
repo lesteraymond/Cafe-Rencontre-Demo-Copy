@@ -1,3 +1,7 @@
+<?php
+require_once 'backend/config/database.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -1082,22 +1086,111 @@
         <!-- JAVASCRIPT -->
         <script>
             // Data
-            const products = [
-                { id: 1, name: "Spanish Latte", price: 160, cat: "brewed", img: "https://data.thefeedfeed.com/static/2022/12/19/167148578963a0d95dd1a02.jpg" },
-                { id: 2, name: "Machiato", price: 150, cat: "brewed", img: "https://www.thespruceeats.com/thmb/HXaU0FwlEoZ6d5MoPVzGCXKx41k=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/85153452-56a176765f9b58b7d0bf84dd.jpg" },
-                { id: 3, name: "Hazelnut Latte", price: 170, cat: "brewed", img: "https://lifestyleofafoodie.com/wp-content/uploads/2024/04/Spanish-Latte-Recipe-5.jpg" },
-                { id: 4, name: "Americano", price: 120, cat: "brewed", img: "https://loveincrediblerecipes.com/wp-content/uploads/2023/12/nespresso-americano-1200x1200-1.jpg" },
-                { id: 5, name: "Caramel Macchiato", price: 170, cat: "brewed", img: "https://athome.starbucks.com/sites/default/files/styles/recipe_banner_xlarge/public/2024-05/CaramelMacchiato_RecipeHeader_848x539_%402x.jpg.webp?itok=jO6d0gba" },
-                { id: 6, name: "Vanilla Latte", price: 165, cat: "brewed", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReXQigakVzOdxqfoOQsuvQ6PCm3icW--IOYg&s" },
-                { id: 7, name: "Strawberry Milk", price: 140, cat: "milk", img: "https://www.cookerru.com/wp-content/uploads/2021/01/korean-strawberry-milk-feature-main.jpg" },
-                { id: 8, name: "Strawberry Hazelnut", price: 155, cat: "milk", img: "https://theveggieyaya.com/wp-content/uploads/2024/06/iced-strawberry-latte-square-image.jpg" },
-                { id: 9, name: "Choco Milk", price: 145, cat: "milk", img: "https://www.thespruceeats.com/thmb/93UHJ043ztF5RyiPsyFJt_OVCs8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/chocolate-milk-recipe-2355494-hero-02-80cffdb175904e03a8fd6bb7d6ffc0dd.jpg" },
-                { id: 10, name: "Strawberry", price: 130, cat: "soda", img: "https://mocktail.net/wp-content/uploads/2022/06/Homemade-Strawberry-Soda_11ig.jpg" },
-                { id: 11, name: "Blueberry", price: 135, cat: "soda", img: "https://img.freepik.com/premium-photo/blueberry-soda-plastic-cup_504796-499.jpg" },
-                { id: 12, name: "Green Apple", price: 135, cat: "soda", img: "https://www.shutterstock.com/image-photo/plastic-glass-refreshing-iced-green-260nw-1850934520.jpg" },
-                { id: 13, name: "Blue Lemonade", price: 140, cat: "soda", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrabIPKt5940sVoStVoFKt7iV9QBlSWVaZLA&s" },
-                { id: 14, name: "Lychee", price: 140, cat: "soda", img: "https://img.freepik.com/free-photo/lychee-juice-lychee-fruit_1150-13685.jpg?semt=ais_hybrid&w=740&q=80" },
-                { id: 15, name: "Four Season", price: 145, cat: "soda", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVEX8dwT83HVWXLS5WuX7YY0fZZwuwZVZwOA&s" }
+            const products = [{
+                    id: 1,
+                    name: "Spanish Latte",
+                    price: 160,
+                    cat: "brewed",
+                    img: "https://data.thefeedfeed.com/static/2022/12/19/167148578963a0d95dd1a02.jpg"
+                },
+                {
+                    id: 2,
+                    name: "Machiato",
+                    price: 150,
+                    cat: "brewed",
+                    img: "https://www.thespruceeats.com/thmb/HXaU0FwlEoZ6d5MoPVzGCXKx41k=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/85153452-56a176765f9b58b7d0bf84dd.jpg"
+                },
+                {
+                    id: 3,
+                    name: "Hazelnut Latte",
+                    price: 170,
+                    cat: "brewed",
+                    img: "https://lifestyleofafoodie.com/wp-content/uploads/2024/04/Spanish-Latte-Recipe-5.jpg"
+                },
+                {
+                    id: 4,
+                    name: "Americano",
+                    price: 120,
+                    cat: "brewed",
+                    img: "https://loveincrediblerecipes.com/wp-content/uploads/2023/12/nespresso-americano-1200x1200-1.jpg"
+                },
+                {
+                    id: 5,
+                    name: "Caramel Macchiato",
+                    price: 170,
+                    cat: "brewed",
+                    img: "https://athome.starbucks.com/sites/default/files/styles/recipe_banner_xlarge/public/2024-05/CaramelMacchiato_RecipeHeader_848x539_%402x.jpg.webp?itok=jO6d0gba"
+                },
+                {
+                    id: 6,
+                    name: "Vanilla Latte",
+                    price: 165,
+                    cat: "brewed",
+                    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReXQigakVzOdxqfoOQsuvQ6PCm3icW--IOYg&s"
+                },
+                {
+                    id: 7,
+                    name: "Strawberry Milk",
+                    price: 140,
+                    cat: "milk",
+                    img: "https://www.cookerru.com/wp-content/uploads/2021/01/korean-strawberry-milk-feature-main.jpg"
+                },
+                {
+                    id: 8,
+                    name: "Strawberry Hazelnut",
+                    price: 155,
+                    cat: "milk",
+                    img: "https://theveggieyaya.com/wp-content/uploads/2024/06/iced-strawberry-latte-square-image.jpg"
+                },
+                {
+                    id: 9,
+                    name: "Choco Milk",
+                    price: 145,
+                    cat: "milk",
+                    img: "https://www.thespruceeats.com/thmb/93UHJ043ztF5RyiPsyFJt_OVCs8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/chocolate-milk-recipe-2355494-hero-02-80cffdb175904e03a8fd6bb7d6ffc0dd.jpg"
+                },
+                {
+                    id: 10,
+                    name: "Strawberry",
+                    price: 130,
+                    cat: "soda",
+                    img: "https://mocktail.net/wp-content/uploads/2022/06/Homemade-Strawberry-Soda_11ig.jpg"
+                },
+                {
+                    id: 11,
+                    name: "Blueberry",
+                    price: 135,
+                    cat: "soda",
+                    img: "https://img.freepik.com/premium-photo/blueberry-soda-plastic-cup_504796-499.jpg"
+                },
+                {
+                    id: 12,
+                    name: "Green Apple",
+                    price: 135,
+                    cat: "soda",
+                    img: "https://www.shutterstock.com/image-photo/plastic-glass-refreshing-iced-green-260nw-1850934520.jpg"
+                },
+                {
+                    id: 13,
+                    name: "Blue Lemonade",
+                    price: 140,
+                    cat: "soda",
+                    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrabIPKt5940sVoStVoFKt7iV9QBlSWVaZLA&s"
+                },
+                {
+                    id: 14,
+                    name: "Lychee",
+                    price: 140,
+                    cat: "soda",
+                    img: "https://img.freepik.com/free-photo/lychee-juice-lychee-fruit_1150-13685.jpg?semt=ais_hybrid&w=740&q=80"
+                },
+                {
+                    id: 15,
+                    name: "Four Season",
+                    price: 145,
+                    cat: "soda",
+                    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVEX8dwT83HVWXLS5WuX7YY0fZZwuwZVZwOA&s"
+                }
             ];
 
             let cart = [];
@@ -1132,7 +1225,9 @@
                 setTimeout(() => {
                     const element = document.getElementById(section);
                     if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
+                        element.scrollIntoView({
+                            behavior: 'smooth'
+                        });
                     }
                     // Set active nav
                     document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
@@ -1178,7 +1273,8 @@
                         </button>
                     </div>
                 </div>
-            `}).join('');
+            `
+                }).join('');
             }
 
             function openProductModal(id) {
@@ -1329,8 +1425,17 @@
                 document.getElementById('modal-total').innerText = total.toFixed(2);
             }
 
-            function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-            function updateQty(n) { if (qty + n > 0) { qty += n; document.getElementById('modal-qty').innerText = qty; updateTotal(); } }
+            function closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+            }
+
+            function updateQty(n) {
+                if (qty + n > 0) {
+                    qty += n;
+                    document.getElementById('modal-qty').innerText = qty;
+                    updateTotal();
+                }
+            }
 
             function addToCart() {
                 let basePrice = currentProduct.price;
@@ -1356,7 +1461,14 @@
                 }
 
                 total *= qty;
-                cart.push({ ...currentProduct, qty: qty, size: selectedSize, temp: selectedTemp, addOns: [...addOns], total: total });
+                cart.push({
+                    ...currentProduct,
+                    qty: qty,
+                    size: selectedSize,
+                    temp: selectedTemp,
+                    addOns: [...addOns],
+                    total: total
+                });
                 updateCart();
                 closeModal('product-modal');
             }
@@ -1568,7 +1680,10 @@
             }
 
             const dz = document.getElementById('drop-zone');
-            dz.ondragover = (e) => { e.preventDefault(); dz.style.background = '#eee'; };
+            dz.ondragover = (e) => {
+                e.preventDefault();
+                dz.style.background = '#eee';
+            };
             dz.ondrop = (e) => {
                 e.preventDefault();
                 dz.innerHTML = '<i class="fas fa-check" style="color:green; font-size:1.5rem;"></i> Uploaded';
