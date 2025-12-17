@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cafe Rencontre</title>
+  <link rel="stylesheet" href="Login.css">
+  <script src="Login.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lily+Script+One&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet">
+
+  <link rel="shortcut icon" href="assets/Logo.png" type="image/x-icon">
+
+</head>
+
+<body>
+  <div class="background-Image">
+    <span class="image-bg1"><img src="/Background-Image/image 9.png" alt=""></span>
+    <span class="image-bg1-2"><img src="/Background-Image/image 10.png" alt=""></span>
+  </div>
+  <div class="login-card">
+    <div class="Logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+      <img src="/Background-Image/Cafe Rencontre Logo.svg" alt="Cafe Rencontre Logo">
+    </div>
+    <div class="Texttitle">
+      <h1>Cafe Rencontre</h1>
+      <p>Admin Portal</p>
+      <h2>Admin Login</h2>
+    </div>
+    <div class="login-cotainer">
+      <form id="LoginForm">
+        <label for="username">Username</label>
+        <div class="user-input">
+          <span class="icon"><img src="Background-Image/User Logo.svg" alt=""></span>
+          <input type="text" id="username" placeholder="Email or username">
+        </div>
+
+        <label for="password">Password</label>
+        <div class="pass-input">
+          <span class="icon"><img src="Background-Image/Lock Icon.svg" alt=""></span>
+          <input type="password" id="password" placeholder="Password">
+          <span class="toggle"><img src="/Background-Image/tonggle.png" alt=""></span>
+        </div>
+
+        <div class="remember-me">
+          <input type="checkbox" id="rememberMe">
+          <label for="rememberMe">Remember me</label>
+        </div>
+
+
+        <button class="sign-in">
+          <span class="sign-in-icon"><img src="/Background-Image/Sign in icon.svg" alt=""></span>
+          <p>Sign in</p>
+        </button>
+
+        <div class="forgot">
+          <p id="ForgotPassword">Forgot your password?</p>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</body>
+
+</html>

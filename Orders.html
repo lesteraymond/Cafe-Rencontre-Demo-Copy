@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders</title>
+  <link rel="stylesheet" href="Ingredients.css">
+  <link rel="stylesheet" href="Product.css">
+  <link rel="stylesheet" href="Orders.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lily+Script+One&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fjalla+One&family=Montserrat:ital,wght@0,700;1,700&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital@0;1&display=swap"
+    rel="stylesheet">
+  <link rel="shortcut icon" href="assets/Logo.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="dashborad-card">
+    <div class="logo-title-btn">
+      <div class="logo-title">
+        <span class="logo"><img src="/Background-Image/Cafe Rencontre Logo.svg" alt=""></span>
+        <p class="Text-title">Cafe Rencontre</p>
+      </div>
+      <button id="back-button" class="back-btn">
+        <span class="back-icon"><img src="/Background-Image/Lock Icon.svg" alt=""></span>
+        <p>Log out</p>
+      </button>
+    </div>
+
+    <div class="container-bar">
+      <ul class="nav-bar">
+        <div class="products">
+          <img src="/Background-Image/Box.png" alt="">
+          <li><a href="Product.html">Products</a></li>
+        </div>
+        <div class="Ingredients">
+          <img src="/Background-Image/storage.png" alt="">
+          <li><a href="Ingredients.html">Ingredients</a></li>
+        </div>
+        <div class="cart">
+          <img src="/Background-Image/cart.png" alt="">
+          <li><a href="Orders.html" class="active">Orders</a></li>
+        </div>
+        <div class="report">
+          <img src="/Background-Image/report.png" alt="">
+          <li><a href="Analytics.html">Analytics</a></li>
+        </div>
+      </ul>
+    </div>
+
+
+    <div class="ingredients-management-card">
+      <div class="title-add-ingredients">
+        <div class="title">
+          <p>Order Management</p>
+        </div>
+      </div>
+
+      <div id="search" class="search-container">
+        <span><img id="search-icon" class="icon" src="/Background-Image/magnifying glass.png" alt=""></span>
+        <input class="search-bar" type="text" placeholder="Search">
+      </div>
+
+
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-status="all">All</button>
+        <button class="filter-tab" data-status="pending">Pending</button>
+        <button class="filter-tab" data-status="approved">Approved</button>
+        <button class="filter-tab" data-status="completed">Completed</button>
+        <button class="filter-tab" data-status="rejected">Rejected</button>
+      </div>
+
+      <div id="ordersList"></div>
+    </div>
+  </div>
+
+  <div id="orderModal" class="modal">
+    <div class="modal-content">
+      <span class="close-icon" onclick="closeModal()">&times;</span>
+
+      <h2>Order Details</h2>
+
+      <div class="modal-info-grid">
+        <div class="info-row">
+          <span class="label">Ingredients Name:</span>
+          <span class="value" id="modalCustomer"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Email:</span>
+          <span class="value" id="modalEmail"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Order Date:</span>
+          <span class="value" id="modalDate"></span>
+        </div>
+        <div class="info-row">
+          <span class="label">Status:</span>
+          <span class="value status-text" id="modalStatus"></span>
+        </div>
+      </div>
+
+      <p class="section-title">Ordered Items</p>
+
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-right">Price</th>
+            <th class="text-right">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="modalItemsList">
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="total-label">Total:</td>
+            <td class="total-amount" id="modalTotal"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="payment-proof-container">
+        <div class="pp-left">
+          <p class="pp-title">Payment Proof</p>
+          <p class="pp-file">File: payment-receipt-001.jpg</p>
+        </div>
+        <div class="pp-right">
+          <button class="view-doc-btn">View Document</button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-reject" onclick="closeModal()">Reject</button>
+        <button class="btn-approve" onclick="closeModal()">Approve</button>
+        <button class="btn-close" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+  <script src="auth.js"></script>
+
+  <script src="Orders.js"></script>
+</body>
+
+</html>

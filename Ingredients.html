@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="Ingredients.css">
+  <link rel="stylesheet" href="Product.css">
+  <link rel="stylesheet" href="Orders.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lily+Script+One&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fjalla+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,700;1,700&family=Quicksand:wght@300..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital@0;1&display=swap"
+    rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fjalla+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,700;1,700&family=Quicksand:wght@300..700&family=Roboto+Condensed&family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital@0;1&display=swap"
+    rel="stylesheet">
+  <link rel="shortcut icon" href="assets/Logo.png" type="image/x-icon">
+
+<body>
+  </head>
+
+  <body>
+    <div class="dashborad-card">
+      <div class="logo-title-btn">
+        <div class="logo-title">
+          <span class="logo"><img src="/Background-Image/Cafe Rencontre Logo.svg" alt=""></span>
+          <p class="Text-title">Cafe Rencontre</p>
+        </div>
+        <button id="back-button" class="back-btn">
+          <span class="back-icon"><img src="/Background-Image/Lock Icon.svg" alt=""></span>
+          <p>Log out</p>
+        </button>
+      </div>
+      <div class="container-bar">
+        <ul class="nav-bar">
+          <div class="products">
+            <img src="/Background-Image/Box.png" alt="">
+            <li><a href="Product.html">Products</a></li>
+          </div>
+          <div class="Ingredients">
+            <img src="/Background-Image/storage.png" alt="">
+            <li><a href="Ingredients.html" class="active">Ingredients</a></li>
+          </div>
+          <div class="cart">
+            <img src="/Background-Image/cart.png" alt="">
+            <li><a href="Orders.html">Orders</a></li>
+          </div>
+          <div class="report">
+            <img src="/Background-Image/report.png" alt="">
+            <li><a href="Analytics.html">Analytics</a></li>
+          </div>
+        </ul>
+      </div>
+
+
+      <div class="ingredients-management-card">
+        <div class="title-add-ingredients">
+          <div class="title">
+            <p>Ingredients Inventory</p>
+          </div>
+          <button id="add-button" class="add-btn">
+            <span><img class="white" src="/Background-Image/Plus.png" alt=""></span>
+            <p>Add Ingredients</p>
+          </button>
+        </div>
+        <div id="search" class="search-container">
+          <span><img id="search-icon" class="icon" src="/Background-Image/magnifying glass.png" alt=""></span>
+          <input class="search-bar" type="text" placeholder="Search">
+          <span><img id="filter-icon" class="icon" src="/Background-Image/filter icon.png" alt=""></span>
+        </div>
+
+        <div id="IngredientsList" class="ingredients-list"></div>
+        <div id="popup" class="popup-container">
+          <div class="popup-content">
+            <span id="closePopup" class="close-btn">&times;</span>
+            <h2>Add Ingredients</h2>
+
+            <label class="title">Ingredients Name:</label>
+            <input type="text" id="ingname" class="input-box-ing-name">
+
+            <label class="title">Unit:</label>
+            <input list="unit-options" id="unit" class="input-box-unit">
+            <datalist id="unit-options">
+              <option value="ML">ML (Milliliter)</option>
+              <option value="G">G (Gram)</option>
+              <option value="KG">KG (Kilogram)</option>
+              <option value="L">L (Liter)</option>
+              <option value="PCS">PCS (Pieces)</option>
+              <option value="OZ">OZ (Ounce)</option>
+            </datalist>
+            <label class="title">Pack/Bottle:</label>
+            <textarea id="pack" class="input-box-Pack-bottle"></textarea>
+
+            <label class="title">Quantity:</label>
+            <input type="text" id="quantity" class="input-box-number">
+
+
+            <div class="popup-actions">
+              <button id="cancelPopup" class="cancel-btn">Cancel</button>
+              <button id="confirmPopup" class="confirm-btn">Confirm</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="deletePopup" class="popup-container">
+          <div class="popup-content">
+            <span id="closeDeletePopup" class="close-btn">&times;</span>
+            <h2>Delete Ingredient</h2>
+
+            <div class="delete">
+              <p>Are you sure you want to delete this ingredient?</p>
+              <p>This action cannot be undone.</p>
+            </div>
+
+            <div class="popup-buttons">
+              <div class="Delete-btn">
+                <button id="confirmDelete" class="confirm-btn-delete">Delete</button>
+              </div>
+              <div class="Cancel-btn">
+                <button id="cancelDelete" class="cancel">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="auth.js"></script>
+    <script src="Ingredients.js"></script>
+  </body>
+
+</html>

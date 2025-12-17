@@ -1,0 +1,163 @@
+body {
+  font-family: "Lily Script One", "cursive" "Inter", "Playfair Display", "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #F8EADA;
+}
+.background-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.image-bg1 {
+  position: fixed;
+  width: 420px;
+  top: -120px;
+  right: -140px;
+  pointer-events: none;
+  user-select: none;
+}
+.image-bg1-2 {
+  position: fixed;
+  width: 400px;
+  bottom: -50px;
+  left: -145px;
+  pointer-events: none;
+  user-select: none;
+}.image-bg1-2 img {
+  width: 100%;
+}
+.login-card {
+  width: 380px;
+  padding: 40px 35px;
+  background: #fff7f0;
+  border-radius: 20px;
+  margin: 80px auto;
+  box-shadow: 20px 20px 0px #CB6D33;
+  border: 2px solid #d8aa8a;
+  text-align: center;
+    
+}
+.logo {
+  margin-bottom: 15px;
+}
+.logo img {
+  width: 90px;
+}
+.Texttitle h1 {
+  font-family: "Lily Script One", "cursive";
+  font-size: 36px;
+  color: #6b3a1f;
+  margin: 0;
+  font-weight: 600;
+}
+.Texttitle p {
+  font-family: "Inter",;
+  font-size: 14px;
+  color: #6b3a1f;
+  margin: 5px 0 20px 0;
+}
+.Texttitle h2 {
+  font-family: "Playfair Display",;
+  font-size: 20px;
+  color: #6F4E37;
+  margin: 0 0 20px 0;
+  font-weight: 600;
+}
+label {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  color: #A18072;
+  margin-top: 10px;
+  font-family: "Inter";
+  margin-bottom: 10px;
+}
+.user-input {
+  position: relative;
+  margin-top: 5px;
+}
+.user-input input {
+  width: 300px;
+  padding: 12px 40px;
+  border-radius: 8px;
+  border: 1px solid #e2d2c4;
+  background: #faf7f3;
+}
+.user-input::placeholder {
+  color: #c4b2a3;
+}
+.pass-input {
+  position: relative;
+  margin-top: 5px;
+}
+.pass-input input {
+  width: 300px;
+  padding: 12px 40px;
+  border-radius: 8px;
+  border: 1px solid #e2d2c4;
+  background: #faf7f3;
+}
+.pass-input::placeholder {
+  color: #c4b2a3;
+} 
+.icon, .toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: #a7866a;
+}
+.icon {
+  left: 12px;
+}
+.toggle {
+  right: 12px;
+  cursor: pointer;
+}
+.remember-me {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #A18072;
+}
+.remember-me input {
+  margin-right: 5px;
+}
+.remember-me label {
+  margin: 0;
+}
+.sign-in {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background: #6F4E37;
+  color: white;
+  margin-top: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.sign-in-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.sign-in p {
+  display: inline-block;
+  margin-left: 5px;
+}
+.sign-in:hover {
+  background: #5e3420;
+}
+.forgot {
+  margin-top: 12px;
+  color: #A18072;
+  font-size: 13px;
+  font-family: "Inter";
+  cursor: pointer;
+}
+.forgot:hover {
+  text-decoration: underline;
+}
+
