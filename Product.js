@@ -94,37 +94,41 @@ function addProductToDOM(product) {
     productElement.className = "product-item";
     productElement.dataset.id = product.id;
     
-    productElement.innerHTML = `
-        <div class="product-info">
-            <div class="name-category">
-                <div class="name">
-                    <h3>${escapeHtml(product.name)}</h3>
-                </div>
-                <div class="category">
-                    <p>${escapeHtml(product.category)}</p>
-                </div>
+    // In addProductToDOM function, replace the button-group HTML:
+productElement.innerHTML = `
+    <div class="product-info">
+        <div class="name-category">
+            <div class="name">
+                <h3>${escapeHtml(product.name)}</h3>
             </div>
-            <div class="description">
-                <p>
-                    <span class="desc-text">${escapeHtml(product.description)}</span>
-                    <img class="edit-icon" src="/Background-Image/edit icon.png" alt="Edit">
-                </p>
+            <div class="category">
+                <p>${escapeHtml(product.category)}</p>
             </div>
         </div>
-        <div class="price-stock-button-delete-button">
-            <div class="price-stock">
-                <p>₱${parseFloat(product.base_price).toFixed(2)}</p>
-            </div>
-            <div class="button-group">
-                <button class="delete-btn">
-                    <img src="/Background-Image/delete icon.png" alt="Delete">
-                </button>
-                <button class="stock-toggle">
-                    <img class="in-stock" src="/Background-Image/${product.is_available == 1 ? 'toggle left.jpg' : 'toggle right.jpg'}" alt="Toggle Stock">
-                </button>
-            </div>
+        <div class="description">
+            <p>
+                <span class="desc-text">${escapeHtml(product.description)}</span>
+                <img class="edit-icon" src="/Background-Image/edit icon.png" alt="Edit">
+            </p>
         </div>
-    `;
+    </div>
+    <div class="price-stock-button-delete-button">
+        <div class="price-stock">
+            <p>₱${parseFloat(product.base_price).toFixed(2)}</p>
+        </div>
+        <div class="button-group">
+            <button class="delete-btn">
+                <img src="/Background-Image/delete icon.png" alt="Delete">
+            </button>
+            <button class="stock-toggle ${product.is_available == 1 ? 'toggle-on' : 'toggle-off'}" 
+                    title="${product.is_available == 1 ? 'In Stock - Click to mark as Out of Stock' : 'Out of Stock - Click to mark as In Stock'}">
+                <span class="toggle-slider"></span>
+                <span class="toggle-text on">ON</span>
+                <span class="toggle-text off">OFF</span>
+            </button>
+        </div>
+    </div>
+`;
     
     const editBtn = productElement.querySelector(".edit-icon");
     const deleteBtn = productElement.querySelector(".delete-btn");
@@ -316,11 +320,15 @@ document.getElementById("confirmDelete").onclick = async () => {
 
 async function toggleProductStock(productElement) {
     const productId = productElement.dataset.id;
-    const stockImage = productElement.querySelector(".in-stock");
-    const currentSrc = stockImage.src.toLowerCase();
-    const isAvailable = currentSrc.includes("toggle left");
+    const toggleBtn = productElement.querySelector(".stock-toggle");
+    const isAvailable = toggleBtn.classList.contains("toggle-on");
     
     const newAvailability = isAvailable ? 0 : 1;
+    
+    toggleBtn.classList.add("toggle-click");
+    setTimeout(() => {
+        toggleBtn.classList.remove("toggle-click");
+    }, 200);
     
     try {
         const response = await fetch(`${API_BASE_URL}/products.php`, {
@@ -342,16 +350,54 @@ async function toggleProductStock(productElement) {
         const data = await response.json();
         
         if (data.success) {
-            stockImage.src = newAvailability == 1 ? 
-                "/Background-Image/toggle left.jpg" : 
-                "/Background-Image/toggle right.jpg";
+            if (newAvailability == 1) {
+                toggleBtn.classList.remove("toggle-off");
+                toggleBtn.classList.add("toggle-on");
+                toggleBtn.title = "In Stock - Click to mark as Out of Stock";
+            } else {
+                toggleBtn.classList.remove("toggle-on");
+                toggleBtn.classList.add("toggle-off");
+                toggleBtn.title = "Out of Stock - Click to mark as In Stock";
+            }
+            
+            showStatusMessage(newAvailability == 1 ? "✓ Product marked as In Stock" : "✗ Product marked as Out of Stock");
         } else {
             alert("Failed to update stock: " + data.message);
+            toggleBtn.classList.toggle("toggle-on");
+            toggleBtn.classList.toggle("toggle-off");
         }
     } catch (error) {
         console.error('Error toggling stock:', error);
         alert('Error updating stock status');
+        toggleBtn.classList.toggle("toggle-on");
+        toggleBtn.classList.toggle("toggle-off");
     }
+}
+
+function showStatusMessage(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #333;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 10000;
+        font-size: 14px;
+        opacity: 0.9;
+        transition: opacity 0.3s;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 2000);
 }
 
 function closePopup() {
