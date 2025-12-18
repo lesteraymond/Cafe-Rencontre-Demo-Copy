@@ -443,10 +443,10 @@ require_once 'backend/config/database.php';
         /* Product Detail Modal */
         .modal {
             background: white;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 450px;
+            padding: 20px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 380px;
             position: relative;
             animation: slideUp 0.4s ease;
         }
@@ -782,72 +782,65 @@ require_once 'backend/config/database.php';
         <!-- 1. Product Modal -->
         <div class="overlay" id="product-modal">
             <div class="modal">
-                <span style="position:absolute; top:15px; right:20px; font-size:1.5rem; cursor:pointer;"
+                <span style="position:absolute; top:10px; right:15px; font-size:1.3rem; cursor:pointer;"
                     onclick="closeModal('product-modal')">&times;</span>
-                <div style="display:flex; gap:20px; margin-bottom:20px;">
-                    <img id="modal-img" src="" style="width:80px; height:80px; border-radius:10px; object-fit:cover;">
+                <div style="display:flex; gap:15px; margin-bottom:15px;">
+                    <img id="modal-img" src="" style="width:60px; height:60px; border-radius:8px; object-fit:cover;">
                     <div>
-                        <h3 id="modal-name">Product</h3>
-                        <p id="modal-price" style="color:var(--primary); font-weight:600;">₱0.00</p>
+                        <h3 id="modal-name" style="font-size:1.1rem; margin-bottom:5px;">Product</h3>
+                        <p id="modal-price" style="color:var(--primary); font-weight:600; font-size:0.9rem;">₱0.00</p>
                     </div>
                 </div>
-
-                <div class="size-section" style="margin-bottom:15px;">
-                    <label style="font-weight:600; display:block; margin-bottom:5px;">Size</label>
-                    <div style="display:flex; gap:10px;">
-                        <button class="cat-btn active" style="padding:5px 15px; font-size:0.9rem;"
+                <div class="size-section" style="margin-bottom:12px;">
+                    <label style="font-weight:600; display:block; margin-bottom:3px; font-size:0.9rem;">Size</label>
+                    <div style="display:flex; gap:8px;">
+                        <button class="cat-btn active" style="padding:4px 12px; font-size:0.8rem;"
                             onclick="selectSize(this, 'truth')">Truth (₱49)</button>
-                        <button class="cat-btn" style="padding:5px 15px; font-size:0.9rem;"
+                        <button class="cat-btn" style="padding:4px 12px; font-size:0.8rem;"
                             onclick="selectSize(this, 'unity')">Unity (₱69)</button>
                     </div>
                 </div>
-
-                <div class="temp-section" style="margin-bottom:15px;">
-                    <label style="font-weight:600; display:block; margin-bottom:5px;">Temperature</label>
-                    <div style="display:flex; gap:10px;">
-                        <button class="cat-btn active" style="padding:5px 15px; font-size:0.9rem;"
+                <div class="temp-section" style="margin-bottom:12px;">
+                    <label style="font-weight:600; display:block; margin-bottom:3px; font-size:0.9rem;">Temperature</label>
+                    <div style="display:flex; gap:8px;">
+                        <button class="cat-btn active" style="padding:4px 12px; font-size:0.8rem;"
                             onclick="selectTemp(this, 'iced')">Iced</button>
-                        <button class="cat-btn" style="padding:5px 15px; font-size:0.9rem;"
+                        <button class="cat-btn" style="padding:4px 12px; font-size:0.8rem;"
                             onclick="selectTemp(this, 'hot')">Hot</button>
                     </div>
                 </div>
-
-                <div class="addons-section" style="margin-bottom:15px;">
-                    <label style="font-weight:600; display:block; margin-bottom:5px;">Add-ons</label>
-                    <div style="display:flex; flex-direction:column; gap:5px;">
-                        <label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"
+                <div class="addons-section" style="margin-bottom:12px;">
+                    <label style="font-weight:600; display:block; margin-bottom:3px; font-size:0.9rem;">Add-ons</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:3px; font-size:0.8rem;">
+                        <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox"
                                 onchange="updateTotal()" data-price="20"> Extra Shot (+₱20)</label>
-                        <label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"
-                                onchange="updateTotal()" data-price="15"> Caramel Drizzle (+₱15)</label>
-                        <label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"
+                        <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox"
+                                onchange="updateTotal()" data-price="15"> Caramel (+₱15)</label>
+                        <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox"
                                 onchange="updateTotal()" data-price="10"> Vanilla (+₱10)</label>
-                        <label style="display:flex; align-items:center; gap:10px;"><input type="checkbox"
-                                onchange="updateTotal()" data-price="15"> Whipped Cream (+₱15)</label>
+                        <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox"
+                                onchange="updateTotal()" data-price="15"> Whipped (+₱15)</label>
                     </div>
                 </div>
-
-                <div class="custom-section" style="margin-bottom:15px;">
-                    <label style="font-weight:600; display:block; margin-bottom:5px;">Customizations</label>
-                    <textarea id="custom-text" class="form-input" rows="3"
-                        placeholder="Describe your customizations (e.g., extra sugar, less ice, special ingredients, etc.)"
-                        oninput="updateTotal()"></textarea>
+                <div class="custom-section" style="margin-bottom:12px;">
+                    <label style="font-weight:600; display:block; margin-bottom:3px; font-size:0.9rem;">Custom</label>
+                    <textarea id="custom-text" class="form-input" rows="2" style="font-size:0.8rem; padding:8px;"
+                        placeholder="Special requests (optional)" oninput="updateTotal()"></textarea>
                 </div>
-
-                <div style="margin-bottom:20px;">
-                    <label style="font-weight:600; display:block; margin-bottom:5px;">Quantity</label>
+                <div style="margin-bottom:15px;">
+                    <label style="font-weight:600; display:block; margin-bottom:3px; font-size:0.9rem;">Quantity</label>
                     <div
-                        style="display:flex; align-items:center; gap:15px; border:1px solid #ddd; width:fit-content; padding:5px 15px; border-radius:20px;">
-                        <button onclick="updateQty(-1)" style="background:none;">-</button>
-                        <span id="modal-qty">1</span>
-                        <button onclick="updateQty(1)" style="background:none;">+</button>
+                        style="display:flex; align-items:center; gap:12px; border:1px solid #ddd; width:fit-content; padding:3px 12px; border-radius:15px;">
+                        <button onclick="updateQty(-1)" style="background:none; font-size:1.1rem;">-</button>
+                        <span id="modal-qty" style="font-weight:600;">1</span>
+                        <button onclick="updateQty(1)" style="background:none; font-size:1.1rem;">+</button>
                     </div>
                 </div>
-
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-order" style="flex:1;" onclick="addToCart()">Add to Cart (₱<span
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-order" style="flex:1; padding:10px; font-size:0.9rem;" onclick="addToCart()">Add (₱<span
                             id="modal-total">0.00</span>)</button>
                     <button onclick="closeModal('product-modal')"
-                        style="background:#ccc; color:#333; padding:12px 20px; border-radius:30px; font-weight:600;">Cancel</button>
+                        style="background:#ccc; color:#333; padding:10px 15px; border-radius:25px; font-weight:600; font-size:0.9rem;">Cancel</button>
                 </div>
             </div>
         </div>
