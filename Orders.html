@@ -88,7 +88,7 @@
 
       <div class="modal-info-grid">
         <div class="info-row">
-          <span class="label">Ingredients Name:</span>
+          <span class="label">Customer Name:</span>
           <span class="value" id="modalCustomer"></span>
         </div>
         <div class="info-row">
@@ -126,13 +126,13 @@
         </tfoot>
       </table>
 
-      <div class="payment-proof-container">
+      <div class="payment-proof-container" id="paymentProofContainer">
         <div class="pp-left">
           <p class="pp-title">Payment Proof</p>
-          <p class="pp-file">File: payment-receipt-001.jpg</p>
+          <p class="pp-file" id="paymentProofFile">No payment proof uploaded</p>
         </div>
         <div class="pp-right">
-          <button class="view-doc-btn">View Document</button>
+          <button class="view-doc-btn" id="viewProofBtn" onclick="viewPaymentProof()" style="display:none;">View Document</button>
         </div>
       </div>
 

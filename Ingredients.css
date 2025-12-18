@@ -449,3 +449,40 @@
   min-width: 40px;
   text-align: right;
 }
+
+.loading, .no-ingredients, .error {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    grid-column: 1 / -1;
+}
+
+.loading p, .no-ingredients p {
+    font-size: 16px;
+}
+
+.error {
+    color: #ff6b6b;
+}
+
+.error button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #532C04;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.progress-fill.low {
+    background-color: #ff6b6b !important;
+}
+
+.progress-fill.medium {
+    background-color: #ffa726 !important;
+}
+
+.progress-fill.high {
+    background-color: #4CAF50 !important;
+}

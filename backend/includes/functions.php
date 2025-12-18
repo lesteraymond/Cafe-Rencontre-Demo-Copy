@@ -66,9 +66,17 @@ function uploadFile($file, $allowedTypes = ['image/jpeg', 'image/png', 'image/jp
         return ['success' => false, 'message' => 'File too large (max 5MB)'];
     }
 
+    // Auto-create uploads directory if it doesn't exist
+    $uploadDir = __DIR__ . '/../uploads/';
+    if (!is_dir($uploadDir)) {
+        if (!mkdir($uploadDir, 0755, true)) {
+            return ['success' => false, 'message' => 'Failed to create upload directory'];
+        }
+    }
+
     $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = uniqid() . '.' . $extension;
-    $uploadPath = '../uploads/' . $filename;
+    $uploadPath = $uploadDir . $filename;
 
     if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
         return ['success' => true, 'filename' => $filename];

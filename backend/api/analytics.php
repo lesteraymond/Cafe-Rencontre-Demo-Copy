@@ -68,8 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     SUM(final_amount) as revenue
                  FROM orders 
                  WHERE status = 'completed'
-                 GROUP BY $groupBy
-                 ORDER BY order_date DESC
+                 GROUP BY period
+                 ORDER BY period DESC
                  LIMIT $limit";
 
     $result = $conn->query($trendSQL);
@@ -182,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     SUM(CASE WHEN status = 'completed' THEN final_amount ELSE 0 END) as daily_revenue
                  FROM orders 
                  WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-                 GROUP BY DATE(order_date)
+                 GROUP BY date
                  ORDER BY date DESC";
 
     $result = $conn->query($dailySQL);
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     COUNT(*) as order_count
                 FROM orders 
                 WHERE status = 'completed'
-                GROUP BY HOUR(order_date)
+                GROUP BY hour
                 ORDER BY order_count DESC
                 LIMIT 5";
 

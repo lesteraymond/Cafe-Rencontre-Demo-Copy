@@ -194,13 +194,115 @@ switch ($_SERVER['REQUEST_METHOD']) {
             jsonResponse(false, 'Invalid status');
         }
 
-        $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
-        $stmt->bind_param("si", $status, $id);
+        // Get current order status
+        $checkStmt = $conn->prepare("SELECT status FROM orders WHERE id = ?");
+        $checkStmt->bind_param("i", $id);
+        $checkStmt->execute();
+        $currentOrder = $checkStmt->get_result()->fetch_assoc();
+        $checkStmt->close();
+        
+        if (!$currentOrder) {
+            jsonResponse(false, 'Order not found');
+        }
+        
+        $previousStatus = $currentOrder['status'];
 
-        if ($stmt->execute()) {
-            jsonResponse(true, 'Order status updated successfully');
-        } else {
-            jsonResponse(false, 'Failed to update order status');
+        $conn->begin_transaction();
+
+        try {
+            // Update order status
+            $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
+            $stmt->bind_param("si", $status, $id);
+            
+            if (!$stmt->execute()) {
+                throw new Exception('Failed to update order status');
+            }
+            $stmt->close();
+
+            // If order is being completed, deduct ingredients and update stats
+            if ($status === 'completed' && $previousStatus !== 'completed') {
+                // Get order items
+                $itemsStmt = $conn->prepare("SELECT oi.*, o.order_date FROM order_items oi 
+                                             JOIN orders o ON o.id = oi.order_id 
+                                             WHERE oi.order_id = ?");
+                $itemsStmt->bind_param("i", $id);
+                $itemsStmt->execute();
+                $itemsResult = $itemsStmt->get_result();
+                
+                while ($item = $itemsResult->fetch_assoc()) {
+                    $productId = $item['product_id'];
+                    $quantity = $item['quantity'];
+                    $orderDate = date('Y-m-d', strtotime($item['order_date']));
+                    $subtotal = $item['subtotal'];
+                    
+                    // Update product order stats
+                    $statsStmt = $conn->prepare("INSERT INTO product_order_stats 
+                                                 (product_id, order_date, order_count, total_quantity, total_revenue) 
+                                                 VALUES (?, ?, 1, ?, ?)
+                                                 ON DUPLICATE KEY UPDATE 
+                                                 order_count = order_count + 1,
+                                                 total_quantity = total_quantity + VALUES(total_quantity),
+                                                 total_revenue = total_revenue + VALUES(total_revenue)");
+                    $statsStmt->bind_param("isid", $productId, $orderDate, $quantity, $subtotal);
+                    $statsStmt->execute();
+                    $statsStmt->close();
+                    
+                    // Deduct ingredients for this product
+                    $ingredientsStmt = $conn->prepare("SELECT pi.ingredient_id, pi.quantity_needed, i.available_quantity, i.name
+                                                       FROM product_ingredients pi
+                                                       JOIN ingredients i ON i.id = pi.ingredient_id
+                                                       WHERE pi.product_id = ?");
+                    $ingredientsStmt->bind_param("i", $productId);
+                    $ingredientsStmt->execute();
+                    $ingredientsResult = $ingredientsStmt->get_result();
+                    
+                    while ($ingredient = $ingredientsResult->fetch_assoc()) {
+                        $deductAmount = $ingredient['quantity_needed'] * $quantity;
+                        $previousQty = $ingredient['available_quantity'];
+                        $newQty = max(0, $previousQty - $deductAmount);
+                        
+                        // Update ingredient quantity
+                        $updateIngStmt = $conn->prepare("UPDATE ingredients SET available_quantity = ? WHERE id = ?");
+                        $updateIngStmt->bind_param("di", $newQty, $ingredient['ingredient_id']);
+                        $updateIngStmt->execute();
+                        $updateIngStmt->close();
+                        
+                        // Log the inventory change
+                        $logStmt = $conn->prepare("INSERT INTO inventory_logs 
+                                                   (ingredient_id, order_id, change_type, quantity_change, previous_quantity, new_quantity, notes)
+                                                   VALUES (?, ?, 'deduction', ?, ?, ?, ?)");
+                        $notes = "Order #" . $id . " completed - " . $item['product_name'];
+                        $logStmt->bind_param("iiddds", $ingredient['ingredient_id'], $id, $deductAmount, $previousQty, $newQty, $notes);
+                        $logStmt->execute();
+                        $logStmt->close();
+                    }
+                    $ingredientsStmt->close();
+                }
+                $itemsStmt->close();
+            }
+
+            $conn->commit();
+            
+            // Check for low stock warnings
+            $lowStockWarnings = [];
+            $lowStockStmt = $conn->query("SELECT name, available_quantity, min_threshold,
+                                          ROUND((available_quantity / (bottles_count * bottle_capacity)) * 100, 2) as percentage
+                                          FROM ingredients 
+                                          WHERE available_quantity <= min_threshold 
+                                          OR (bottles_count > 0 AND (available_quantity / (bottles_count * bottle_capacity)) * 100 <= 20)");
+            while ($row = $lowStockStmt->fetch_assoc()) {
+                $lowStockWarnings[] = $row['name'] . ' (' . round($row['percentage'], 1) . '% remaining)';
+            }
+
+            $response = ['message' => 'Order status updated successfully'];
+            if (!empty($lowStockWarnings)) {
+                $response['low_stock_warning'] = $lowStockWarnings;
+            }
+            
+            jsonResponse(true, $response['message'], $response);
+        } catch (Exception $e) {
+            $conn->rollback();
+            jsonResponse(false, $e->getMessage());
         }
         break;
 

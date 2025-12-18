@@ -196,7 +196,7 @@ require_once 'backend/config/database.php';
         .hero h1 {
             font-size: 4.5rem;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 1);
         }
 
         .hero p {
@@ -291,6 +291,11 @@ require_once 'backend/config/database.php';
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .info-item a:hover {
+            color: var(--gold);
+            text-decoration: underline;
         }
 
         /* --- 6. MENU PAGE --- */
@@ -685,22 +690,28 @@ require_once 'backend/config/database.php';
                     </div>
                     <div class="info-item">
                         <i class="fas fa-phone-alt"></i>
-                        <span>0998 548 7050</span>
+                        <a href="tel:+639985487050" style="color: white; text-decoration: none;">0998 548 7050</a>
                     </div>
                     <div class="info-item">
                         <i class="fas fa-envelope"></i>
-                        <span>cafe.rencontre@gmail.com</span>
+                        <a href="mailto:cafe.rencontre@gmail.com" style="color: white; text-decoration: none;">cafe.rencontre@gmail.com</a>
                     </div>
                     <div class="info-item">
                         <i class="fas fa-clock"></i>
                         <span>10:00 AM - 5:00 PM / Weekdays</span>
                     </div>
+                    <a href="https://www.google.com/maps/dir//La+Consolacion+University+Philippines,+Malolos,+Bulacan" 
+                       target="_blank" 
+                       class="btn-order" 
+                       style="display: inline-flex; align-items: center; gap: 10px; margin-top: 20px; text-decoration: none;">
+                        <i class="fas fa-directions"></i> Get Directions
+                    </a>
                 </div>
                 <div class="reveal">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3856.234674987!2d120.8!3d14.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDQ4JzAwLjAiTiAxMjDCsDQ4JzAwLjAiRQ!5e0!3m2!1sen!2sph"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3855.8892!2d120.8095!3d14.8437!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3396531f3e5c7c7d%3A0x8c5e5c5c5c5c5c5c!2sLa%20Consolacion%20University%20Philippines!5e0!3m2!1sen!2sph!4v1702900000000!5m2!1sen!2sph"
                         width="100%" height="350" style="border:0; border-radius: 20px;" allowfullscreen=""
-                        loading="lazy"></iframe>
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </section>
@@ -882,21 +893,21 @@ require_once 'backend/config/database.php';
                         </div>
 
                         <h4 style="font-size:1rem; margin-bottom:10px; margin-top:20px;">Payment Method</h4>
-                        <div class="selection-card selected" onclick="selectPayment(this, 'cash')">
+                        <div class="selection-card payment-card selected" onclick="selectPaymentMethod(this, 'cash')">
                             <i class="fas fa-money-bill-wave" style="color:var(--primary); font-size:1.2rem;"></i>
                             <div>
                                 <strong>Cash</strong>
                                 <div style="font-size:0.8rem; color:#666;">Pay at counter</div>
                             </div>
                         </div>
-                        <div class="selection-card" onclick="openCardPaymentModal()">
+                        <div class="selection-card payment-card" onclick="selectPaymentMethod(this, 'card'); openCardPaymentModal()">
                             <i class="fas fa-credit-card" style="color:var(--primary); font-size:1.2rem;"></i>
                             <div>
                                 <strong>Card</strong>
                                 <div style="font-size:0.8rem; color:#666;">Credit/Debit Card</div>
                             </div>
                         </div>
-                        <div class="selection-card" onclick="openOnlinePaymentModal()">
+                        <div class="selection-card payment-card" onclick="selectPaymentMethod(this, 'online'); openOnlinePaymentModal()">
                             <i class="fas fa-mobile-alt" style="color:var(--primary); font-size:1.2rem;"></i>
                             <div>
                                 <strong>Online</strong>
@@ -943,14 +954,16 @@ require_once 'backend/config/database.php';
                 </div>
 
                 <div style="text-align:left;">
-                    <label style="font-weight:600;">Upload ID <span style="color:red">*</span></label>
-                    <div class="upload-zone" id="drop-zone">
+                    <label style="font-weight:600;">Upload Payment Proof / ID <span style="color:red">*</span></label>
+                    <input type="file" id="payment-proof-input" accept="image/*,.pdf" style="display:none;">
+                    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('payment-proof-input').click()">
                         <i class="fas fa-cloud-upload-alt" style="font-size:1.5rem; margin-bottom:5px;"></i><br>
-                        Click to upload
+                        <span id="upload-text">Click or drag to upload</span>
                     </div>
+                    <p id="upload-status" style="font-size:0.8rem; color:#666; margin-top:5px;"></p>
 
                     <label style="font-weight:600;">Room Number <span style="color:red">*</span></label>
-                    <input type="text" class="form-input" placeholder="e.g. Room 101">
+                    <input type="text" class="form-input" id="room-number-input" placeholder="e.g. Room 101">
 
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
                         <input type="checkbox" id="terms">
@@ -1078,113 +1091,33 @@ require_once 'backend/config/database.php';
 
         <!-- JAVASCRIPT -->
         <script>
-            // Data
-            const products = [{
-                    id: 1,
-                    name: "Spanish Latte",
-                    price: 160,
-                    cat: "brewed",
-                    img: "https://data.thefeedfeed.com/static/2022/12/19/167148578963a0d95dd1a02.jpg"
-                },
-                {
-                    id: 2,
-                    name: "Machiato",
-                    price: 150,
-                    cat: "brewed",
-                    img: "https://www.thespruceeats.com/thmb/HXaU0FwlEoZ6d5MoPVzGCXKx41k=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/85153452-56a176765f9b58b7d0bf84dd.jpg"
-                },
-                {
-                    id: 3,
-                    name: "Hazelnut Latte",
-                    price: 170,
-                    cat: "brewed",
-                    img: "https://lifestyleofafoodie.com/wp-content/uploads/2024/04/Spanish-Latte-Recipe-5.jpg"
-                },
-                {
-                    id: 4,
-                    name: "Americano",
-                    price: 120,
-                    cat: "brewed",
-                    img: "https://loveincrediblerecipes.com/wp-content/uploads/2023/12/nespresso-americano-1200x1200-1.jpg"
-                },
-                {
-                    id: 5,
-                    name: "Caramel Macchiato",
-                    price: 170,
-                    cat: "brewed",
-                    img: "https://athome.starbucks.com/sites/default/files/styles/recipe_banner_xlarge/public/2024-05/CaramelMacchiato_RecipeHeader_848x539_%402x.jpg.webp?itok=jO6d0gba"
-                },
-                {
-                    id: 6,
-                    name: "Vanilla Latte",
-                    price: 165,
-                    cat: "brewed",
-                    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReXQigakVzOdxqfoOQsuvQ6PCm3icW--IOYg&s"
-                },
-                {
-                    id: 7,
-                    name: "Strawberry Milk",
-                    price: 140,
-                    cat: "milk",
-                    img: "https://www.cookerru.com/wp-content/uploads/2021/01/korean-strawberry-milk-feature-main.jpg"
-                },
-                {
-                    id: 8,
-                    name: "Strawberry Hazelnut",
-                    price: 155,
-                    cat: "milk",
-                    img: "https://theveggieyaya.com/wp-content/uploads/2024/06/iced-strawberry-latte-square-image.jpg"
-                },
-                {
-                    id: 9,
-                    name: "Choco Milk",
-                    price: 145,
-                    cat: "milk",
-                    img: "https://www.thespruceeats.com/thmb/93UHJ043ztF5RyiPsyFJt_OVCs8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/chocolate-milk-recipe-2355494-hero-02-80cffdb175904e03a8fd6bb7d6ffc0dd.jpg"
-                },
-                {
-                    id: 10,
-                    name: "Strawberry",
-                    price: 130,
-                    cat: "soda",
-                    img: "https://mocktail.net/wp-content/uploads/2022/06/Homemade-Strawberry-Soda_11ig.jpg"
-                },
-                {
-                    id: 11,
-                    name: "Blueberry",
-                    price: 135,
-                    cat: "soda",
-                    img: "https://img.freepik.com/premium-photo/blueberry-soda-plastic-cup_504796-499.jpg"
-                },
-                {
-                    id: 12,
-                    name: "Green Apple",
-                    price: 135,
-                    cat: "soda",
-                    img: "https://www.shutterstock.com/image-photo/plastic-glass-refreshing-iced-green-260nw-1850934520.jpg"
-                },
-                {
-                    id: 13,
-                    name: "Blue Lemonade",
-                    price: 140,
-                    cat: "soda",
-                    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrabIPKt5940sVoStVoFKt7iV9QBlSWVaZLA&s"
-                },
-                {
-                    id: 14,
-                    name: "Lychee",
-                    price: 140,
-                    cat: "soda",
-                    img: "https://img.freepik.com/free-photo/lychee-juice-lychee-fruit_1150-13685.jpg?semt=ais_hybrid&w=740&q=80"
-                },
-                {
-                    id: 15,
-                    name: "Four Season",
-                    price: 145,
-                    cat: "soda",
-                    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVEX8dwT83HVWXLS5WuX7YY0fZZwuwZVZwOA&s"
+            // Products loaded from database
+            let products = [];
+            
+            // Load products from database
+            async function loadProductsFromDB() {
+                try {
+                    const response = await fetch('backend/api/public-products.php');
+                    const result = await response.json();
+                    
+                    if (result.success && result.data) {
+                        products = result.data;
+                        // Re-render current category after loading
+                        const activeBtn = document.querySelector('.cat-btn.active');
+                        if (activeBtn) {
+                            const cat = activeBtn.textContent.toLowerCase().includes('brewed') ? 'brewed' :
+                                       activeBtn.textContent.toLowerCase().includes('milk') ? 'milk' : 'soda';
+                            renderMenu(cat, activeBtn);
+                        } else {
+                            renderMenu('brewed');
+                        }
+                    } else {
+                        console.error('Failed to load products:', result.message);
+                    }
+                } catch (error) {
+                    console.error('Error loading products:', error);
                 }
-            ];
+            }
 
             let cart = [];
             let currentProduct = null;
@@ -1540,11 +1473,19 @@ require_once 'backend/config/database.php';
             }
 
             function selectType(el, type) {
-                document.querySelectorAll('.selection-card').forEach(c => c.classList.remove('selected'));
+                // Only affect customer type cards, not payment cards
+                document.querySelectorAll('.selection-card:not(.payment-card)').forEach(c => c.classList.remove('selected'));
                 el.classList.add('selected');
                 isStudent = (type === 'student');
                 let sub = cart.reduce((a, b) => a + b.total, 0);
                 calculateTotals(sub);
+            }
+            
+            function selectPaymentMethod(el, method) {
+                // Only affect payment cards
+                document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+                el.classList.add('selected');
+                selectedPayment = method;
             }
 
             function calculateTotals(sub) {
@@ -1559,12 +1500,145 @@ require_once 'backend/config/database.php';
                 setTimeout(() => document.getElementById('confirm-overlay').classList.add('active'), 300);
             }
 
-            function finalizeOrder() {
+            async function finalizeOrder() {
                 if (!document.getElementById('terms').checked) return alert("Please confirm details.");
-                alert("Order Placed Successfully!");
-                cart = [];
-                updateCart();
-                closeModal('confirm-overlay');
+                
+                // Get customer info from checkout form
+                const customerName = document.querySelector('.checkout-left input[placeholder="Full Name"]').value.trim();
+                const customerPhone = document.querySelector('.checkout-left input[placeholder="Phone Number"]').value.trim();
+                const roomNumber = document.getElementById('room-number-input').value.trim();
+                
+                if (!customerName) {
+                    alert("Please enter your name.");
+                    return;
+                }
+                
+                if (!customerPhone) {
+                    alert("Please enter your phone number.");
+                    return;
+                }
+                
+                if (!roomNumber) {
+                    alert("Please enter your room number.");
+                    return;
+                }
+                
+                // Validate payment proof for online/card payments
+                if ((selectedPayment === 'online' || selectedPayment === 'card') && !uploadedPaymentProof) {
+                    alert("Please upload payment proof for online/card payments.");
+                    return;
+                }
+                
+                // Calculate totals
+                const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
+                const discountAmount = isStudent ? subtotal * 0.10 : 0;
+                const finalAmount = subtotal - discountAmount;
+                
+                // Prepare order items
+                const orderItems = cart.map(item => ({
+                    product_id: item.id,
+                    product_name: item.name,
+                    size: item.size || '',
+                    temperature: item.temp || '',
+                    quantity: item.qty,
+                    unit_price: item.total / item.qty,
+                    subtotal: item.total,
+                    customizations: item.addOns ? item.addOns.join(', ') : ''
+                }));
+                
+                // Prepare order data
+                const orderData = {
+                    customer_name: customerName,
+                    customer_phone: customerPhone,
+                    room_number: roomNumber,
+                    total_amount: subtotal,
+                    payment_method: selectedPayment,
+                    payment_proof: uploadedPaymentProof || '',
+                    is_student: isStudent ? 1 : 0,
+                    discount_amount: discountAmount,
+                    final_amount: finalAmount,
+                    items: orderItems
+                };
+                
+                try {
+                    // Show loading state
+                    const confirmBtn = document.querySelector('#confirm-overlay .btn-order');
+                    const originalText = confirmBtn.textContent;
+                    confirmBtn.textContent = 'Processing...';
+                    confirmBtn.disabled = true;
+                    
+                    const response = await fetch('backend/api/public-orders.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Show success message with order number
+                        const orderNumber = result.data?.order_number || 'N/A';
+                        showOrderSuccess(orderNumber);
+                        
+                        // Clear cart and close modals
+                        cart = [];
+                        updateCart();
+                        closeModal('confirm-overlay');
+                        
+                        // Clear form fields
+                        document.querySelector('.checkout-left input[placeholder="Full Name"]').value = '';
+                        document.querySelector('.checkout-left input[placeholder="Phone Number"]').value = '';
+                        document.getElementById('room-number-input').value = '';
+                        document.getElementById('terms').checked = false;
+                        resetUploadZone();
+                        
+                    } else {
+                        alert('Failed to place order: ' + (result.message || 'Unknown error'));
+                    }
+                    
+                    confirmBtn.textContent = originalText;
+                    confirmBtn.disabled = false;
+                    
+                } catch (error) {
+                    console.error('Error placing order:', error);
+                    alert('Error placing order. Please try again.');
+                    
+                    const confirmBtn = document.querySelector('#confirm-overlay .btn-order');
+                    confirmBtn.textContent = 'Confirm Order';
+                    confirmBtn.disabled = false;
+                }
+            }
+            
+            function showOrderSuccess(orderNumber) {
+                // Create success modal
+                const successModal = document.createElement('div');
+                successModal.className = 'overlay active';
+                successModal.id = 'success-modal';
+                successModal.innerHTML = `
+                    <div class="confirm-modal" style="text-align: center;">
+                        <div style="margin-bottom: 20px;">
+                            <i class="fas fa-check-circle" style="font-size: 4rem; color: #4CAF50;"></i>
+                        </div>
+                        <h2 style="color: var(--primary); margin-bottom: 10px;">Order Placed Successfully!</h2>
+                        <p style="color: #666; margin-bottom: 20px;">Your order has been received and is being processed.</p>
+                        <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                            <p style="font-size: 0.9rem; color: #666;">Order Number</p>
+                            <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${orderNumber}</p>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Please save this order number for tracking your order.</p>
+                        <button class="btn-order" onclick="closeSuccessModal()" style="width: 100%;">Continue Shopping</button>
+                    </div>
+                `;
+                document.body.appendChild(successModal);
+            }
+            
+            function closeSuccessModal() {
+                const modal = document.getElementById('success-modal');
+                if (modal) {
+                    modal.remove();
+                }
                 switchView('home');
             }
 
@@ -1672,19 +1746,111 @@ require_once 'backend/config/database.php';
                 proceedToConfirm();
             }
 
+            // Payment proof upload handling
+            let uploadedPaymentProof = null;
+            
             const dz = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('payment-proof-input');
+            const uploadStatus = document.getElementById('upload-status');
+            
+            // Drag and drop handlers
             dz.ondragover = (e) => {
                 e.preventDefault();
                 dz.style.background = '#eee';
+                dz.style.borderColor = 'var(--primary)';
             };
+            
+            dz.ondragleave = (e) => {
+                e.preventDefault();
+                dz.style.background = '';
+                dz.style.borderColor = '#ccc';
+            };
+            
             dz.ondrop = (e) => {
                 e.preventDefault();
-                dz.innerHTML = '<i class="fas fa-check" style="color:green; font-size:1.5rem;"></i> Uploaded';
-                dz.style.borderColor = 'green';
+                dz.style.background = '';
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
             };
+            
+            // File input change handler
+            fileInput.onchange = (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            };
+            
+            async function handleFileUpload(file) {
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'application/pdf'];
+                if (!allowedTypes.includes(file.type)) {
+                    uploadStatus.textContent = 'Invalid file type. Please upload an image or PDF.';
+                    uploadStatus.style.color = 'red';
+                    return;
+                }
+                
+                // Validate file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    uploadStatus.textContent = 'File too large. Maximum size is 5MB.';
+                    uploadStatus.style.color = 'red';
+                    return;
+                }
+                
+                // Show uploading state
+                dz.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i><br><span>Uploading...</span>';
+                uploadStatus.textContent = '';
+                
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    const response = await fetch('backend/api/public-upload.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const responseText = await response.text();
+                    
+                    let result;
+                    try {
+                        result = JSON.parse(responseText);
+                    } catch (parseError) {
+                        console.error('Response text:', responseText);
+                        throw new Error('Server error: Invalid response. Check console for details.');
+                    }
+                    
+                    if (result.success) {
+                        uploadedPaymentProof = result.data.filename;
+                        dz.innerHTML = '<i class="fas fa-check-circle" style="color:green; font-size:1.5rem;"></i><br><span style="color:green;">Uploaded!</span>';
+                        dz.style.borderColor = 'green';
+                        uploadStatus.textContent = 'File: ' + file.name;
+                        uploadStatus.style.color = 'green';
+                    } else {
+                        throw new Error(result.message || 'Upload failed');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    dz.innerHTML = '<i class="fas fa-cloud-upload-alt" style="font-size:1.5rem; margin-bottom:5px;"></i><br><span id="upload-text">Click or drag to upload</span>';
+                    dz.style.borderColor = '#ccc';
+                    uploadStatus.textContent = 'Upload failed: ' + error.message;
+                    uploadStatus.style.color = 'red';
+                    uploadedPaymentProof = null;
+                }
+            }
+            
+            function resetUploadZone() {
+                uploadedPaymentProof = null;
+                dz.innerHTML = '<i class="fas fa-cloud-upload-alt" style="font-size:1.5rem; margin-bottom:5px;"></i><br><span id="upload-text">Click or drag to upload</span>';
+                dz.style.borderColor = '#ccc';
+                uploadStatus.textContent = '';
+                fileInput.value = '';
+            }
 
-            window.onload = () => {
-                renderMenu('brewed');
+            window.onload = async () => {
+                // Load products from database first
+                await loadProductsFromDB();
                 document.querySelector('.reveal').classList.add('active');
             };
         </script>
