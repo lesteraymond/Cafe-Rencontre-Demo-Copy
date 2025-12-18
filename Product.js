@@ -420,6 +420,14 @@ function clearFields() {
 
 function filterProducts(searchTerm) {
     const productItems = document.querySelectorAll(".product-item");
+    const container = document.getElementById("productList");
+    
+    const existingNoResults = container.querySelector('.no-results');
+    if (existingNoResults) {
+        existingNoResults.remove();
+    }
+    
+    let visibleCount = 0;
     
     productItems.forEach(item => {
         const productName = item.querySelector(".name h3").textContent.toLowerCase();
@@ -430,8 +438,22 @@ function filterProducts(searchTerm) {
                        productCategory.includes(searchTerm) || 
                        productDesc.includes(searchTerm);
         
-        item.style.display = matches ? "block" : "none";
+        if (matches || !searchTerm) {
+            item.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            item.classList.add('hidden');
+        }
     });
+    
+    if (visibleCount === 0 && searchTerm) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.innerHTML = `
+            <p>No products found for "<strong>${escapeHtml(searchTerm)}</strong>"</p>
+        `;
+        container.appendChild(noResults);
+    }
 }
 
 function debounce(func, wait) {
