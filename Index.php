@@ -700,10 +700,10 @@ require_once 'backend/config/database.php';
                         <i class="fas fa-clock"></i>
                         <span>10:00 AM - 5:00 PM / Weekdays</span>
                     </div>
-                    <a href="https://www.google.com/maps/dir//La+Consolacion+University+Philippines,+Malolos,+Bulacan" 
-                       target="_blank" 
-                       class="btn-order" 
-                       style="display: inline-flex; align-items: center; gap: 10px; margin-top: 20px; text-decoration: none;">
+                    <a href="https://www.google.com/maps/dir//La+Consolacion+University+Philippines,+Malolos,+Bulacan"
+                        target="_blank"
+                        class="btn-order"
+                        style="display: inline-flex; align-items: center; gap: 10px; margin-top: 20px; text-decoration: none;">
                         <i class="fas fa-directions"></i> Get Directions
                     </a>
                 </div>
@@ -1093,20 +1093,20 @@ require_once 'backend/config/database.php';
         <script>
             // Products loaded from database
             let products = [];
-            
+
             // Load products from database
             async function loadProductsFromDB() {
                 try {
                     const response = await fetch('backend/api/public-products.php');
                     const result = await response.json();
-                    
+
                     if (result.success && result.data) {
                         products = result.data;
                         // Re-render current category after loading
                         const activeBtn = document.querySelector('.cat-btn.active');
                         if (activeBtn) {
                             const cat = activeBtn.textContent.toLowerCase().includes('brewed') ? 'brewed' :
-                                       activeBtn.textContent.toLowerCase().includes('milk') ? 'milk' : 'soda';
+                                activeBtn.textContent.toLowerCase().includes('milk') ? 'milk' : 'soda';
                             renderMenu(cat, activeBtn);
                         } else {
                             renderMenu('brewed');
@@ -1129,7 +1129,7 @@ require_once 'backend/config/database.php';
             let selectedPayment = 'cash';
 
             // Navigation
-            function switchView(view) {
+            function switchView(view, skipActiveState = false) {
                 document.querySelectorAll('.view-section').forEach(el => {
                     el.style.opacity = '0';
                     setTimeout(() => el.classList.remove('active-view'), 400);
@@ -1141,13 +1141,15 @@ require_once 'backend/config/database.php';
                     if (view === 'home') window.scrollTo(0, 0);
                 }, 400);
 
-                // Nav active state
-                document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-                if (view === 'home') document.querySelector('.nav-links a[href="#home"]').classList.add('active');
+                // Nav active state (skip if scrolling to a section)
+                if (!skipActiveState) {
+                    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+                    if (view === 'home') document.querySelector('.nav-links a[href="#home"]').classList.add('active');
+                }
             }
 
             function switchToHomeAndScroll(section) {
-                switchView('home');
+                switchView('home', true);
                 setTimeout(() => {
                     const element = document.getElementById(section);
                     if (element) {
@@ -1176,14 +1178,8 @@ require_once 'backend/config/database.php';
                 }
                 const grid = document.getElementById('product-list');
                 grid.innerHTML = products.filter(p => p.cat === cat).map(p => {
-                    let displayPrice = p.price;
-                    if (p.cat === 'brewed') {
-                        displayPrice = '49-69';
-                    } else if (p.cat === 'milk') {
-                        displayPrice = '69-79';
-                    } else if (p.cat === 'soda') {
-                        displayPrice = '49';
-                    }
+                    // Use actual price from database
+                    let displayPrice = parseFloat(p.price).toFixed(2);
 
                     return `
                 <div class="prod-card">
@@ -1226,22 +1222,13 @@ require_once 'backend/config/database.php';
                 const tempSection = document.querySelector('#product-modal .temp-section');
                 const addonsSection = document.querySelector('#product-modal .addons-section');
 
-                if (category === 'brewed') {
-                    sizeSection.style.display = 'block';
-                    tempSection.style.display = 'block';
-                    addonsSection.style.display = 'block';
-                    updateSizeButtonsForBrewed();
-                } else if (category === 'milk') {
-                    sizeSection.style.display = 'block';
-                    tempSection.style.display = 'none';
-                    addonsSection.style.display = 'block';
-                    updateSizeButtonsForMilk();
-                } else if (category === 'soda') {
-                    sizeSection.style.display = 'none';
-                    tempSection.style.display = 'none';
-                    addonsSection.style.display = 'block';
-                    document.getElementById('modal-price').innerText = '₱49';
-                }
+                // Hide size/temp options - price comes from database
+                sizeSection.style.display = 'none';
+                tempSection.style.display = 'none';
+                addonsSection.style.display = 'block';
+
+                // Display actual price from database
+                document.getElementById('modal-price').innerText = '₱' + parseFloat(currentProduct.price).toFixed(2);
             }
 
             function openCustomizationModalForProduct(productId) {
@@ -1322,18 +1309,8 @@ require_once 'backend/config/database.php';
 
             function updateTotal() {
                 addOns = [];
-                let basePrice = currentProduct.price;
-                if (currentProduct.cat === 'brewed') {
-                    if (selectedTemp === 'hot') {
-                        basePrice = selectedSize === 'truth' ? 49 : 69;
-                    } else {
-                        basePrice = selectedSize === 'unity' ? 49 : 59;
-                    }
-                } else if (currentProduct.cat === 'milk') {
-                    basePrice = selectedSize === 'unity' ? 69 : 79;
-                } else if (currentProduct.cat === 'soda') {
-                    basePrice = 49;
-                }
+                // Use actual price from database
+                let basePrice = parseFloat(currentProduct.price);
 
                 let total = basePrice;
                 document.querySelectorAll('#product-modal input[type="checkbox"]:checked').forEach(cb => {
@@ -1364,18 +1341,8 @@ require_once 'backend/config/database.php';
             }
 
             function addToCart() {
-                let basePrice = currentProduct.price;
-                if (currentProduct.cat === 'brewed') {
-                    if (selectedTemp === 'hot') {
-                        basePrice = selectedSize === 'truth' ? 49 : 69;
-                    } else {
-                        basePrice = selectedSize === 'unity' ? 49 : 59;
-                    }
-                } else if (currentProduct.cat === 'milk') {
-                    basePrice = selectedSize === 'unity' ? 69 : 79;
-                } else if (currentProduct.cat === 'soda') {
-                    basePrice = 49;
-                }
+                // Use actual price from database
+                let basePrice = parseFloat(currentProduct.price);
 
                 let total = basePrice;
                 document.querySelectorAll('#product-modal input[type="checkbox"]:checked').forEach(cb => {
@@ -1480,7 +1447,7 @@ require_once 'backend/config/database.php';
                 let sub = cart.reduce((a, b) => a + b.total, 0);
                 calculateTotals(sub);
             }
-            
+
             function selectPaymentMethod(el, method) {
                 // Only affect payment cards
                 document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
@@ -1502,38 +1469,38 @@ require_once 'backend/config/database.php';
 
             async function finalizeOrder() {
                 if (!document.getElementById('terms').checked) return alert("Please confirm details.");
-                
+
                 // Get customer info from checkout form
                 const customerName = document.querySelector('.checkout-left input[placeholder="Full Name"]').value.trim();
                 const customerPhone = document.querySelector('.checkout-left input[placeholder="Phone Number"]').value.trim();
                 const roomNumber = document.getElementById('room-number-input').value.trim();
-                
+
                 if (!customerName) {
                     alert("Please enter your name.");
                     return;
                 }
-                
+
                 if (!customerPhone) {
                     alert("Please enter your phone number.");
                     return;
                 }
-                
+
                 if (!roomNumber) {
                     alert("Please enter your room number.");
                     return;
                 }
-                
+
                 // Validate payment proof for online/card payments
                 if ((selectedPayment === 'online' || selectedPayment === 'card') && !uploadedPaymentProof) {
                     alert("Please upload payment proof for online/card payments.");
                     return;
                 }
-                
+
                 // Calculate totals
                 const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
                 const discountAmount = isStudent ? subtotal * 0.10 : 0;
                 const finalAmount = subtotal - discountAmount;
-                
+
                 // Prepare order items
                 const orderItems = cart.map(item => ({
                     product_id: item.id,
@@ -1545,7 +1512,7 @@ require_once 'backend/config/database.php';
                     subtotal: item.total,
                     customizations: item.addOns ? item.addOns.join(', ') : ''
                 }));
-                
+
                 // Prepare order data
                 const orderData = {
                     customer_name: customerName,
@@ -1559,14 +1526,14 @@ require_once 'backend/config/database.php';
                     final_amount: finalAmount,
                     items: orderItems
                 };
-                
+
                 try {
                     // Show loading state
                     const confirmBtn = document.querySelector('#confirm-overlay .btn-order');
                     const originalText = confirmBtn.textContent;
                     confirmBtn.textContent = 'Processing...';
                     confirmBtn.disabled = true;
-                    
+
                     const response = await fetch('backend/api/public-orders.php', {
                         method: 'POST',
                         headers: {
@@ -1574,43 +1541,43 @@ require_once 'backend/config/database.php';
                         },
                         body: JSON.stringify(orderData)
                     });
-                    
+
                     const result = await response.json();
-                    
+
                     if (result.success) {
                         // Show success message with order number
                         const orderNumber = result.data?.order_number || 'N/A';
                         showOrderSuccess(orderNumber);
-                        
+
                         // Clear cart and close modals
                         cart = [];
                         updateCart();
                         closeModal('confirm-overlay');
-                        
+
                         // Clear form fields
                         document.querySelector('.checkout-left input[placeholder="Full Name"]').value = '';
                         document.querySelector('.checkout-left input[placeholder="Phone Number"]').value = '';
                         document.getElementById('room-number-input').value = '';
                         document.getElementById('terms').checked = false;
                         resetUploadZone();
-                        
+
                     } else {
                         alert('Failed to place order: ' + (result.message || 'Unknown error'));
                     }
-                    
+
                     confirmBtn.textContent = originalText;
                     confirmBtn.disabled = false;
-                    
+
                 } catch (error) {
                     console.error('Error placing order:', error);
                     alert('Error placing order. Please try again.');
-                    
+
                     const confirmBtn = document.querySelector('#confirm-overlay .btn-order');
                     confirmBtn.textContent = 'Confirm Order';
                     confirmBtn.disabled = false;
                 }
             }
-            
+
             function showOrderSuccess(orderNumber) {
                 // Create success modal
                 const successModal = document.createElement('div');
@@ -1633,7 +1600,7 @@ require_once 'backend/config/database.php';
                 `;
                 document.body.appendChild(successModal);
             }
-            
+
             function closeSuccessModal() {
                 const modal = document.getElementById('success-modal');
                 if (modal) {
@@ -1748,24 +1715,24 @@ require_once 'backend/config/database.php';
 
             // Payment proof upload handling
             let uploadedPaymentProof = null;
-            
+
             const dz = document.getElementById('drop-zone');
             const fileInput = document.getElementById('payment-proof-input');
             const uploadStatus = document.getElementById('upload-status');
-            
+
             // Drag and drop handlers
             dz.ondragover = (e) => {
                 e.preventDefault();
                 dz.style.background = '#eee';
                 dz.style.borderColor = 'var(--primary)';
             };
-            
+
             dz.ondragleave = (e) => {
                 e.preventDefault();
                 dz.style.background = '';
                 dz.style.borderColor = '#ccc';
             };
-            
+
             dz.ondrop = (e) => {
                 e.preventDefault();
                 dz.style.background = '';
@@ -1774,14 +1741,14 @@ require_once 'backend/config/database.php';
                     handleFileUpload(files[0]);
                 }
             };
-            
+
             // File input change handler
             fileInput.onchange = (e) => {
                 if (e.target.files.length > 0) {
                     handleFileUpload(e.target.files[0]);
                 }
             };
-            
+
             async function handleFileUpload(file) {
                 // Validate file type
                 const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'application/pdf'];
@@ -1790,29 +1757,29 @@ require_once 'backend/config/database.php';
                     uploadStatus.style.color = 'red';
                     return;
                 }
-                
+
                 // Validate file size (5MB max)
                 if (file.size > 5 * 1024 * 1024) {
                     uploadStatus.textContent = 'File too large. Maximum size is 5MB.';
                     uploadStatus.style.color = 'red';
                     return;
                 }
-                
+
                 // Show uploading state
                 dz.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i><br><span>Uploading...</span>';
                 uploadStatus.textContent = '';
-                
+
                 try {
                     const formData = new FormData();
                     formData.append('file', file);
-                    
+
                     const response = await fetch('backend/api/public-upload.php', {
                         method: 'POST',
                         body: formData
                     });
-                    
+
                     const responseText = await response.text();
-                    
+
                     let result;
                     try {
                         result = JSON.parse(responseText);
@@ -1820,7 +1787,7 @@ require_once 'backend/config/database.php';
                         console.error('Response text:', responseText);
                         throw new Error('Server error: Invalid response. Check console for details.');
                     }
-                    
+
                     if (result.success) {
                         uploadedPaymentProof = result.data.filename;
                         dz.innerHTML = '<i class="fas fa-check-circle" style="color:green; font-size:1.5rem;"></i><br><span style="color:green;">Uploaded!</span>';
@@ -1839,7 +1806,7 @@ require_once 'backend/config/database.php';
                     uploadedPaymentProof = null;
                 }
             }
-            
+
             function resetUploadZone() {
                 uploadedPaymentProof = null;
                 dz.innerHTML = '<i class="fas fa-cloud-upload-alt" style="font-size:1.5rem; margin-bottom:5px;"></i><br><span id="upload-text">Click or drag to upload</span>';

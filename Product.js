@@ -2,6 +2,7 @@
 
 let editingProduct = null;
 let deletingProduct = null;
+let uploadedImageUrl = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     initializePage();
@@ -17,6 +18,9 @@ function initializePage() {
     document.getElementById("pprice").addEventListener("input", function(e) {
         this.value = this.value.replace(/[^0-9.]/g, '');
     });
+    
+    // Image upload handler
+    document.getElementById("pimage").addEventListener("change", handleImageUpload);
     
     document.getElementById("add-button").onclick = () => {
         editingProduct = null;
@@ -93,6 +97,7 @@ function addProductToDOM(product) {
     const productElement = document.createElement("div");
     productElement.className = "product-item";
     productElement.dataset.id = product.id;
+    productElement.dataset.imageUrl = product.image_url || '';
     
     // In addProductToDOM function, replace the button-group HTML:
 productElement.innerHTML = `
@@ -202,6 +207,11 @@ document.getElementById("confirmPopup").onclick = async () => {
         base_price: parseFloat(price)
     };
     
+    // Add image URL if uploaded
+    if (uploadedImageUrl) {
+        productData.image_url = uploadedImageUrl;
+    }
+    
     if (editingProduct) {
         const productId = editingProduct.dataset.id;
         if (!productId) {
@@ -250,6 +260,18 @@ function openEdit(productElement) {
     document.getElementById("pcategory").value = category;
     document.getElementById("pdesc").value = description;
     document.getElementById("pprice").value = price;
+    
+    // Load existing image if available
+    const existingImage = productElement.dataset.imageUrl;
+    const preview = document.getElementById("imagePreview");
+    if (existingImage && existingImage !== 'null' && existingImage !== '') {
+        uploadedImageUrl = existingImage;
+        preview.innerHTML = `<img src="${existingImage}" alt="Preview"><span class="remove-image" onclick="removeImage()">&times;</span>`;
+    } else {
+        uploadedImageUrl = null;
+        preview.innerHTML = '';
+    }
+    document.getElementById("pimage").value = "";
     
     document.getElementById("popup").style.display = "flex";
 }
@@ -416,6 +438,73 @@ function clearFields() {
     document.getElementById("pcategory").value = "";
     document.getElementById("pdesc").value = "";
     document.getElementById("pprice").value = "";
+    document.getElementById("pimage").value = "";
+    document.getElementById("imagePreview").innerHTML = "";
+    uploadedImageUrl = null;
+}
+
+async function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Invalid file type. Please upload JPG, PNG, or WEBP images.');
+        e.target.value = '';
+        return;
+    }
+    
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File too large. Maximum size is 5MB.');
+        e.target.value = '';
+        return;
+    }
+    
+    // Show preview
+    const preview = document.getElementById("imagePreview");
+    preview.innerHTML = '<p class="uploading-text">Uploading...</p>';
+    
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/product-upload.php`, {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+        });
+        
+        const text = await response.text();
+        let result;
+        try {
+            result = JSON.parse(text);
+        } catch {
+            console.error('Server response:', text);
+            throw new Error('Server returned invalid response');
+        }
+        
+        if (result.success) {
+            uploadedImageUrl = result.data.url;
+            preview.innerHTML = `<img src="${uploadedImageUrl}" alt="Preview"><span class="remove-image" onclick="removeImage()">&times;</span>`;
+        } else {
+            alert('Upload failed: ' + result.message);
+            preview.innerHTML = '';
+            e.target.value = '';
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        alert('Failed to upload image: ' + error.message);
+        preview.innerHTML = '';
+        e.target.value = '';
+    }
+}
+
+function removeImage() {
+    document.getElementById("pimage").value = "";
+    document.getElementById("imagePreview").innerHTML = "";
+    uploadedImageUrl = null;
 }
 
 function filterProducts(searchTerm) {
