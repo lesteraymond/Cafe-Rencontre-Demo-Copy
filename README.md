@@ -1,4 +1,4 @@
-## A Coffee Shop Management System
+# Café Rencontre 
 
 ---
 
