@@ -25,6 +25,14 @@ if (!$conn) {
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
+        // Return low stock count for notification badge
+        if (isset($_GET['count_low_stock']) && $_GET['count_low_stock'] === 'true') {
+            $countStmt = $conn->query("SELECT COUNT(*) as count FROM ingredients 
+                                       WHERE bottles_count > 0 AND (100 - (available_quantity / bottles_count) * 100) >= 80");
+            $countResult = $countStmt->fetch_assoc();
+            echo json_encode(['success' => true, 'low_stock_count' => intval($countResult['count'])]);
+            exit;
+        }
         handleGetRequest($conn);
         break;
 
@@ -52,7 +60,10 @@ function handleGetRequest($conn)
     $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
 
     $sql = "SELECT *, 
-            ROUND((available_quantity / (bottles_count * bottle_capacity)) * 100, 2) as percentage 
+            CASE 
+                WHEN bottles_count > 0 THEN ROUND(100 - (available_quantity / bottles_count) * 100)
+                ELSE 0 
+            END as percentage 
             FROM ingredients WHERE 1=1";
 
     $params = [];
@@ -79,9 +90,8 @@ function handleGetRequest($conn)
     $ingredients = [];
     while ($row = $result->fetch_assoc()) {
         if (!isset($row['percentage'])) {
-            $totalCapacity = $row['bottles_count'] * $row['bottle_capacity'];
-            $row['percentage'] = $totalCapacity > 0 ?
-                round(($row['available_quantity'] / $totalCapacity) * 100, 2) : 0;
+            $row['percentage'] = $row['bottles_count'] > 0 ?
+                round(100 - ($row['available_quantity'] / $row['bottles_count']) * 100) : 0;
         }
         $ingredients[] = $row;
     }
@@ -140,7 +150,7 @@ function handlePostRequest($conn)
         $stmt->close();
 
         $stmt = $conn->prepare("SELECT *, 
-                               ROUND((available_quantity / (bottles_count * bottle_capacity)) * 100, 2) as percentage 
+                               CASE WHEN bottles_count > 0 THEN ROUND(100 - (available_quantity / bottles_count) * 100) ELSE 0 END as percentage 
                                FROM ingredients WHERE id = ?");
         $stmt->bind_param("i", $ingredientId);
         $stmt->execute();
@@ -224,7 +234,7 @@ function handlePutRequest($conn)
         $stmt->close();
 
         $stmt = $conn->prepare("SELECT *, 
-                               ROUND((available_quantity / (bottles_count * bottle_capacity)) * 100, 2) as percentage 
+                               CASE WHEN bottles_count > 0 THEN ROUND(100 - (available_quantity / bottles_count) * 100) ELSE 0 END as percentage 
                                FROM ingredients WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();

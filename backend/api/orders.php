@@ -10,6 +10,16 @@ $conn = getDBConnection();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
+        // Return pending order count for notification badge
+        if (isset($_GET['count_pending']) && $_GET['count_pending'] === 'true') {
+            $countStmt = $conn->prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'pending'");
+            $countStmt->execute();
+            $countResult = $countStmt->get_result()->fetch_assoc();
+            $countStmt->close();
+            echo json_encode(['success' => true, 'pending_count' => intval($countResult['count'])]);
+            exit;
+        }
+
         $status = isset($_GET['status']) ? sanitize($_GET['status']) : '';
         $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
 
@@ -200,11 +210,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
         $checkStmt->execute();
         $currentOrder = $checkStmt->get_result()->fetch_assoc();
         $checkStmt->close();
-        
+
         if (!$currentOrder) {
             jsonResponse(false, 'Order not found');
         }
-        
+
         $previousStatus = $currentOrder['status'];
 
         $conn->begin_transaction();
@@ -213,7 +223,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             // Update order status
             $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
             $stmt->bind_param("si", $status, $id);
-            
+
             if (!$stmt->execute()) {
                 throw new Exception('Failed to update order status');
             }
@@ -228,13 +238,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 $itemsStmt->bind_param("i", $id);
                 $itemsStmt->execute();
                 $itemsResult = $itemsStmt->get_result();
-                
+
                 while ($item = $itemsResult->fetch_assoc()) {
                     $productId = $item['product_id'];
                     $quantity = $item['quantity'];
                     $orderDate = date('Y-m-d', strtotime($item['order_date']));
                     $subtotal = $item['subtotal'];
-                    
+
                     // Update product order stats
                     $statsStmt = $conn->prepare("INSERT INTO product_order_stats 
                                                  (product_id, order_date, order_count, total_quantity, total_revenue) 
@@ -246,7 +256,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     $statsStmt->bind_param("isid", $productId, $orderDate, $quantity, $subtotal);
                     $statsStmt->execute();
                     $statsStmt->close();
-                    
+
                     // Deduct ingredients for this product
                     $ingredientsStmt = $conn->prepare("SELECT pi.ingredient_id, pi.quantity_needed, i.available_quantity, i.name
                                                        FROM product_ingredients pi
@@ -255,18 +265,18 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     $ingredientsStmt->bind_param("i", $productId);
                     $ingredientsStmt->execute();
                     $ingredientsResult = $ingredientsStmt->get_result();
-                    
+
                     while ($ingredient = $ingredientsResult->fetch_assoc()) {
                         $deductAmount = $ingredient['quantity_needed'] * $quantity;
                         $previousQty = $ingredient['available_quantity'];
                         $newQty = max(0, $previousQty - $deductAmount);
-                        
+
                         // Update ingredient quantity
                         $updateIngStmt = $conn->prepare("UPDATE ingredients SET available_quantity = ? WHERE id = ?");
                         $updateIngStmt->bind_param("di", $newQty, $ingredient['ingredient_id']);
                         $updateIngStmt->execute();
                         $updateIngStmt->close();
-                        
+
                         // Log the inventory change
                         $logStmt = $conn->prepare("INSERT INTO inventory_logs 
                                                    (ingredient_id, order_id, change_type, quantity_change, previous_quantity, new_quantity, notes)
@@ -282,7 +292,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             }
 
             $conn->commit();
-            
+
             // Check for low stock warnings
             $lowStockWarnings = [];
             $lowStockStmt = $conn->query("SELECT name, available_quantity, min_threshold,
@@ -298,7 +308,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             if (!empty($lowStockWarnings)) {
                 $response['low_stock_warning'] = $lowStockWarnings;
             }
-            
+
             jsonResponse(true, $response['message'], $response);
         } catch (Exception $e) {
             $conn->rollback();

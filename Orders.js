@@ -292,6 +292,11 @@ async function updateOrderStatus(newStatus) {
             
             closeModal();
             await loadOrders();
+            
+            // Update the notification badge
+            if (typeof updateOrderBadge === 'function') {
+                updateOrderBadge();
+            }
         } else {
             showNotification('Failed to update order: ' + data.message, 'error');
         }

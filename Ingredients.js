@@ -150,10 +150,9 @@ function renderIngredients(ingredients) {
     });
 }
 
-function calculatePercentage(bottles, available, capacity = 2000) {
-    const totalCapacity = bottles * capacity;
-    if (totalCapacity <= 0) return 0;
-    const percentage = Math.min(100, (available / totalCapacity) * 100);
+function calculatePercentage(bottles, available) {
+    if (bottles <= 0) return 0;
+    const percentage = Math.max(0, Math.min(100, 100 - (available / bottles) * 100));
     return Math.round(percentage);
 }
 
@@ -165,13 +164,12 @@ function addIngredientToDOM(ingredient) {
     
     const percentage = ingredient.percentage || calculatePercentage(
         ingredient.bottles_count, 
-        ingredient.available_quantity, 
-        ingredient.bottle_capacity || 2000
+        ingredient.available_quantity
     );
     
-    let progressColor = '#532C04'; // default
-    if (percentage <= 20) progressColor = '#ff6b6b'; // red for low stock
-    else if (percentage <= 50) progressColor = '#ffa726'; // orange for medium stock
+    let progressColor = '#532C04'; // default (low usage)
+    if (percentage >= 80) progressColor = '#ff6b6b'; // red for high usage (low stock)
+    else if (percentage >= 50) progressColor = '#ffa726'; // orange for medium usage
     
     ingredientElement.innerHTML = `
         <div class="ingredient-header">
@@ -193,7 +191,7 @@ function addIngredientToDOM(ingredient) {
             </div>
             <div class="available-info">
                 <span class="label">Available:</span>
-                <span class="available-quantity">${ingredient.available_quantity}</span>
+                <span class="available-quantity">${Math.round(ingredient.available_quantity)}</span>
                 <span class="available-unit">${escapeHtml(ingredient.unit)}</span>
             </div>
         </div>
@@ -298,6 +296,10 @@ document.getElementById("confirmPopup").onclick = async () => {
         if (result.success) {
             await loadIngredients();
             closePopup();
+            // Update the notification badge
+            if (typeof updateIngredientBadge === 'function') {
+                updateIngredientBadge();
+            }
         } else {
             alert("Error: " + result.message);
         }
@@ -377,6 +379,10 @@ document.getElementById("confirmDelete").onclick = async () => {
         if (result.success) {
             deletingIngredient.remove();
             showMessage('Ingredient deleted successfully');
+            // Update the notification badge
+            if (typeof updateIngredientBadge === 'function') {
+                updateIngredientBadge();
+            }
         } else {
             alert("Error: " + result.message);
         }

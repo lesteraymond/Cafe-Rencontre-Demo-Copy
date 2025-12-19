@@ -1606,7 +1606,8 @@ require_once 'backend/config/database.php';
                 if (modal) {
                     modal.remove();
                 }
-                switchView('home');
+                // Stay on menu page after order instead of redirecting to home
+                // switchView('home');
             }
 
             function openCardPaymentModal() {
