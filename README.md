@@ -1,4 +1,3 @@
-# Café Rencontre - Complete System Explanation
 ## A Coffee Shop Management System
 
 ---
