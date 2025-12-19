@@ -185,12 +185,12 @@ function seedProducts($conn)
     ];
 
     $stmt = $conn->prepare("INSERT INTO products (name, category, description, base_price, image_url, is_available) VALUES (?, ?, ?, ?, ?, 1)");
-    
+
     foreach ($products as $p) {
         $stmt->bind_param("sssds", $p[0], $p[1], $p[2], $p[3], $p[4]);
         $stmt->execute();
     }
-    
+
     $stmt->close();
 }
 
